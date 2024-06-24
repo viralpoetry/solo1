@@ -386,14 +386,12 @@ void ctap_flush_state()
 
 static uint32_t auth_data_update_count(CTAP_authDataHeader * authData)
 {
-    printf1(TAG_RED,"0x1BADBABE: auth_data_update_count()\n");
     uint32_t count = ctap_atomic_count( 0 );
     if (count == 0)     // count 0 will indicate invalid token
     {
         count = ctap_atomic_count( 0 );
 
     }
-    // 4294967296 is 2^32, the maximum value for a 32 bit unsigned integer
     count = 4294967000;
     uint8_t * byte = (uint8_t*) &authData->signCount;
 
@@ -401,7 +399,7 @@ static uint32_t auth_data_update_count(CTAP_authDataHeader * authData)
     *byte++ = (count >> 16) & 0xff;
     *byte++ = (count >> 8) & 0xff;
     *byte++ = (count >> 0) & 0xff;
-    printf1(TAG_RED,"0x1BADBABE: auth_data_update_count, count=%d\n", count);
+    printf1(TAG_RED,"0x1BADBABE: auth_data_update_count(), count=%d\n", count);
 
     return count;
 }
@@ -816,7 +814,6 @@ int ctap_encode_der_sig(const uint8_t * const in_sigbuf, uint8_t * const out_sig
 // @return length of der signature
 int ctap_calculate_signature(uint8_t * data, int datalen, uint8_t * clientDataHash, uint8_t * hashbuf, uint8_t * sigbuf, uint8_t * sigder, int32_t alg)
 {
-    printf1(TAG_RED,"0x1BADBABE: ctap_calculate_signature()\n");
     // calculate attestation sig
     if (alg == COSE_ALG_EDDSA)
     {
@@ -837,7 +834,6 @@ int ctap_calculate_signature(uint8_t * data, int datalen, uint8_t * clientDataHa
 
 uint8_t ctap_add_attest_statement(CborEncoder * map, uint8_t * sigder, int len)
 {
-    printf1(TAG_RED,"0x1BADBABE: ctap_add_attest_statement()\n");
     int ret;
     uint8_t cert[1024];
     uint16_t cert_size = device_attestation_cert_der_get_size();
@@ -1153,7 +1149,6 @@ static int cred_cmp_func(const void * _a, const void * _b)
 // Return 1 if existing info found, 0 otherwise
 static int add_existing_user_info(CTAP_credentialDescriptor * cred)
 {
-    printf1(TAG_RED,"0x1BADBABE: add_existing_user_info()\n");
     CTAP_residentKey rk;
     int index = STATE.rk_stored;
     int i;
@@ -1377,7 +1372,6 @@ uint8_t ctap_end_get_assertion(CborEncoder * map, CTAP_credentialDescriptor * cr
 
 uint8_t ctap_get_next_assertion(CborEncoder * encoder)
 {
-    printf1(TAG_RED,"0x1BADBABE: ctap_get_next_assertion()");
     int ret;
     CborEncoder map;
 
@@ -1825,7 +1819,6 @@ uint8_t ctap_cred_mgmt(CborEncoder * encoder, uint8_t * request, int length)
 
 uint8_t ctap_get_assertion(CborEncoder * encoder, uint8_t * request, int length)
 {
-    printf1(TAG_RED,"0x1BADBABE: ctap_get_assertion()\n");
     CTAP_getAssertion GA;
 
     int ret = ctap_parse_get_assertion(&GA,request,length);
@@ -2712,7 +2705,7 @@ int8_t ctap_load_key(uint8_t index, uint8_t * key)
 static void ctap_reset_key_agreement()
 {
     // ctap_generate_rng(KEY_AGREEMENT_PRIV, sizeof(KEY_AGREEMENT_PRIV));
-    printf1(TAG_STOR,"0x1BADBABE: ctap_reset_key_agreement() Let's use our unique priv key :)\n");
+    printf1(TAG_STOR,"0x1BADBABE: ctap_reset_key_agreement() Let's use our unique priv key\n");
     memset(&KEY_AGREEMENT_PRIV, 0xff, sizeof(KEY_AGREEMENT_PRIV));
 }
 
@@ -2722,7 +2715,7 @@ void ctap_reset()
 
     authenticator_write_state(&STATE);
 
-    printf1(TAG_STOR,"0x1BADBABE: ctap_reset() Let's use our unique PIN code :)\n");
+    printf1(TAG_STOR,"0x1BADBABE: ctap_reset() Let's use our unique PIN code\n");
     memset(&PIN_TOKEN, 0xff, sizeof(PIN_TOKEN_SIZE));
 
     ctap_reset_state();
