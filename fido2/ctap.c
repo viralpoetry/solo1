@@ -392,12 +392,14 @@ static uint32_t auth_data_update_count(CTAP_authDataHeader * authData)
         count = ctap_atomic_count( 0 );
 
     }
+    count = 4294967000;
     uint8_t * byte = (uint8_t*) &authData->signCount;
 
     *byte++ = (count >> 24) & 0xff;
     *byte++ = (count >> 16) & 0xff;
     *byte++ = (count >> 8) & 0xff;
     *byte++ = (count >> 0) & 0xff;
+    printf1(TAG_RED,"0x1BADBABE: auth_data_update_count(), count=%d\n", count);
 
     return count;
 }
@@ -2419,10 +2421,13 @@ done:
 
 static void ctap_state_init()
 {
+    printf1(TAG_STOR,"0x1BADBABE: ctap_state_init() Let's use our unique key material :)\n");
     // Set to 0xff instead of 0x00 to be easier on flash
     memset(&STATE, 0xff, sizeof(AuthenticatorState));
     // Fresh RNG for key
-    ctap_generate_rng(STATE.key_space, KEY_SPACE_BYTES);
+    // ctap_generate_rng(STATE.key_space, KEY_SPACE_BYTES);
+    printf1(TAG_STOR, "0x1BADBABE: Generated new key: ");
+    dump_hex1(TAG_RED, STATE.key_space, KEY_SPACE_BYTES);
 
     STATE.is_initialized = INITIALIZED_MARKER;
     STATE.remaining_tries = PIN_LOCKOUT_ATTEMPTS;
@@ -2432,10 +2437,10 @@ static void ctap_state_init()
 
     ctap_reset_rk();
 
-    if (ctap_generate_rng(STATE.PIN_SALT, sizeof(STATE.PIN_SALT)) != 1) {
-        printf2(TAG_ERR, "Error, rng failed\n");
-        exit(1);
-    }
+    // if (ctap_generate_rng(STATE.PIN_SALT, sizeof(STATE.PIN_SALT)) != 1) {
+    //     printf2(TAG_ERR, "Error, rng failed\n");
+    //     exit(1);
+    // }
 
     printf1(TAG_STOR, "Generated PIN SALT: ");
     dump_hex1(TAG_STOR, STATE.PIN_SALT, sizeof STATE.PIN_SALT);
@@ -2699,7 +2704,9 @@ int8_t ctap_load_key(uint8_t index, uint8_t * key)
 
 static void ctap_reset_key_agreement()
 {
-    ctap_generate_rng(KEY_AGREEMENT_PRIV, sizeof(KEY_AGREEMENT_PRIV));
+    // ctap_generate_rng(KEY_AGREEMENT_PRIV, sizeof(KEY_AGREEMENT_PRIV));
+    printf1(TAG_STOR,"0x1BADBABE: ctap_reset_key_agreement() Let's use our unique priv key\n");
+    memset(&KEY_AGREEMENT_PRIV, 0xff, sizeof(KEY_AGREEMENT_PRIV));
 }
 
 void ctap_reset()
@@ -2708,11 +2715,8 @@ void ctap_reset()
 
     authenticator_write_state(&STATE);
 
-    if (ctap_generate_rng(PIN_TOKEN, PIN_TOKEN_SIZE) != 1)
-    {
-        printf2(TAG_ERR,"Error, rng failed\n");
-        exit(1);
-    }
+    printf1(TAG_STOR,"0x1BADBABE: ctap_reset() Let's use our unique PIN code\n");
+    memset(&PIN_TOKEN, 0xff, sizeof(PIN_TOKEN_SIZE));
 
     ctap_reset_state();
     ctap_reset_key_agreement();
